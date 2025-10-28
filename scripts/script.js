@@ -20,6 +20,7 @@ const appURL = window.location.href.replace('index.html', '');
 const appColor = A1lib.mixColor(...COL);
 const rgbColor = `rgb(${COL[0]}, ${COL[1]}, ${COL[2]})`;
 const showTotals = document.getElementById('show-totals');
+const _ = undefined;
 
 // CUSTOM: Tier colors
 const blueColor = A1lib.mixColor(5, 103, 174);
@@ -55,10 +56,11 @@ const spoilsRegex = /Open\s(.*?\sspoils)/;
 let currentSpoils = 'bag of spoils';
 let overlayColor = appColor;
 // Default titlebar state
-util.setTitleBar('Currently not tracking any spoils.', 'icon', 'icon', 'No spoils detected');
+util.setTitleBar('Currently not tracking any spoils.', 'No spoils detected', 'icon', 'icon');
 // Clear titlebar on reload/exit
 $(window).bind('beforeunload', () => {
-  util.setTitleBar('', null, null, '');
+  util.setTitleBar('');
+  window.alt1?.clearBinds();
 });
 
 function startTrack() {
@@ -84,7 +86,7 @@ function startTrack() {
         else if (typeMatch[1] === 'Impressive') overlayColor = purpleColor;
         else if (typeMatch[1] === 'Prestigious') overlayColor = goldColor;
         // Update the titlebar with current spoils type icons
-        util.setTitleBar(`Tracking: ${currentSpoils.replace(/-/g, ' ')}`, typeMatch[1], typeMatch[2].replace(/-/g, '_'));
+        util.setTitleBar(`Tracking: ${currentSpoils.replace(/-/g, ' ')}`, _, typeMatch[1], typeMatch[2].replace(/-/g, '_'));
         // Set overlay text and rectangle for tooltip
         alt1.overLaySetGroup('tracking');
         alt1.overLayTextEx(`Tracking: ${currentSpoils}`, overlayColor, 24, width, 100, 1000, 'Arial', true, true);
