@@ -6,7 +6,7 @@ For those of you who want to track the loot from Harvest Hollow, I reworked the 
 
 It tracks the following: 
 - Spoils received at Maize Maze
-- Loot from spoils and clan goodie bags
+- Loot from spoils and trick or treat bags
 - Items found when skilling throughout Gielinor
 
 ![example](/assets/example.png)
