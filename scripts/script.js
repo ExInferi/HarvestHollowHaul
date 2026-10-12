@@ -127,7 +127,7 @@ let saveChatHistory = util.getSessionStorage(CHAT_SESSION) || [];
 if (!util.getLocalStorage(DISPLAY_MODE)) util.setLocalStorage(DISPLAY_MODE, 'history');
 
 // CUSTOM: Setup additional storage variables
-let clanGoodieBags = parseInt(util.getLocalStorage(`${APP_PREFIX}ClanGoodieBags`)) || 0;
+let trickOrTreatBags = parseInt(util.getLocalStorage(`${APP_PREFIX}TrickOrTreatBags`)) || 0;
 let maizeMaze = parseInt(util.getLocalStorage(`${APP_PREFIX}MaizeMaze`)) || 0;
 
 // CUSTOM: Setup storage variables for spoils - reworked
@@ -222,7 +222,7 @@ function readChatbox() {
   }
   // Check if the chat message contains any of the following strings
   const found = [
-    chat.indexOf('You open the clan goodie bag') > -1,
+    chat.indexOf('You open the chest') > -1,
     chat.indexOf('You open the bag of spoils') > -1,
     chat.indexOf('While skilling you find') > -1,
     chat.indexOf('You receive:') > -1,
@@ -233,7 +233,7 @@ function readChatbox() {
   const foundSpoils = found[3];
   if (found.includes(true)) {
     if (foundBag) {
-      const regex = /(\[\d+:\d+:\d+\]) You open the (clan goodie bag|bag of spoils)\.? and receive: \s?((?:\1 \d+[ x ]?[\w\s'+\-!()\d]+ ?)+)/g
+      const regex = /(\[\d+:\d+:\d+\]) You open the (chest|bag of spoils)\.? and receive: \s?((?:\1 \d+[ x ]?[\w\s'+\-!()\d]+ ?)+)/g
       const itemRegex = /\[\d+:\d+:\d+\] (\d+)\s*x?\s*([\w\s'+\-!()\d]*)/g;
       const rewardRegex = new RegExp(regex.source);
       const rewards = chat.match(regex);
@@ -248,8 +248,8 @@ function readChatbox() {
             counter = `${APP_PREFIX}${currentSpoils.replace(/ /g, '_')}`;
             source = currentSpoils;
             break;
-          case 'clan goodie bag':
-            counter = `${APP_PREFIX}ClanGoodieBags`;
+          case 'chest':
+            counter = `${APP_PREFIX}TrickOrTreatBags`;
             break;
         }
         saveMultipleItems(items, itemRegex, source, counter);
@@ -455,7 +455,7 @@ function createList(total, type) {
     } else {
       const remaining = saveData.length - start;
       if (remaining > 0) {
-        const remainingItems = saveData.reverse().slice(start, start + remaining);
+        const remainingItems = [...saveData].reverse().slice(start, start + remaining);
         appendItems(remainingItems);
       }
     }
@@ -494,15 +494,15 @@ function showItems() {
       break;
     // CUSTOM: Additional displays for custom sources
     case 'bag-of-spoils': {
-      $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="clan-goodie-bag" title="Click to show all Clan Goodie Bag Totals">Bag of Spoils Reward Totals</li>`);
+      $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="trick-or-treat-bag" title="Click to show all Trick or Treat Bag Totals">Bag of Spoils Reward Totals</li>`);
       total = getTotal('spoils');
       text = 'Bags of Spoils Opened';
     }
       break;
-    case 'clan-goodie-bag': {
-      $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="maize-maze" title="Click to show all Maize Maze Totals">Clan Goodie Bag Drop Totals</li>`);
-      total = getTotal('clan goodie bag');
-      text = 'Clan Goodie Bags Opened';
+    case 'trick-or-treat-bag': {
+      $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="maize-maze" title="Click to show all Maize Maze Totals">Trick or Treat Bag Drop Totals</li>`);
+      total = getTotal('chest');
+      text = 'Trick or Treat Bags Opened';
     }
       break;
     case 'maize-maze': {
@@ -586,8 +586,8 @@ function showItems() {
       case "bag-of-spoils":
         totalRewards = bagsOfSpoils;
         break;
-      case "clan-goodie-bag":
-        totalRewards = clanGoodieBags;
+      case "trick-or-treat-bag":
+        totalRewards = trickOrTreatBags;
         break;
       case "maize-maze":
         totalRewards = maizeMaze;
@@ -646,8 +646,8 @@ function createExportData(type) {
     case 'bag-of-spoils':
       total = getTotal('spoils');
       break;
-    case 'clan-goodie-bag':
-      total = getTotal('clan goodie bag');
+    case 'trick-or-treat-bag':
+      total = getTotal('chest');
       break;
     case 'maize-maze':
       total = getTotal('maize maze');
@@ -731,8 +731,8 @@ $(function () {
       case 'bag-of-spoils':
         fileName = `${APP_PREFIX}BagOfSpoilsTotalExport_${downloadDate}.csv`;
         break;
-      case 'clan-goodie-bag':
-        fileName = `${APP_PREFIX}ClanGoodieBagTotalExport_${downloadDate}.csv`;
+      case 'trick-or-treat-bag':
+        fileName = `${APP_PREFIX}TrickOrTreatBagTotalExport_${downloadDate}.csv`;
         break;
       case 'maize-maze':
         fileName = `${APP_PREFIX}MaizeMazeTotalExport_${downloadDate}.csv`;
@@ -760,7 +760,7 @@ $(function () {
     util.deleteLocalStorage(DATA_STORAGE, SELECTED_CHAT, DISPLAY_MODE, `${TOTALS_PREFIX}hide`, `${TOTALS_PREFIX}show`);
     util.deleteSessionStorage(CHAT_SESSION);
     // CUSTOM: Additional storage keys to clear
-    util.deleteLocalStorage(`${APP_PREFIX}ClanGoodieBags`, `${APP_PREFIX}MaizeMaze`);
+    util.deleteLocalStorage(`${APP_PREFIX}TrickOrTreatBags`, `${APP_PREFIX}MaizeMaze`);
     spoils.forEach(spoil => {
       util.deleteLocalStorage(spoil.storage);
     });
@@ -782,7 +782,7 @@ $(function () {
     <li data-show="history" title="Show reward history">Reward History</li>
     <li data-show="total" title="Show reward totals">Reward Totals</li>
     <li data-show="bag-of-spoils" title="Show bag of spoils totals">Bag of Spoils Totals</li>
-    <li data-show="clan-goodie-bag" title="Show clan goodie bag totals">Clan Goodie Bag Totals</li>
+    <li data-show="trick-or-treat-bag" title="Show trick or treat bag totals">Trick or Treat Bag Totals</li>
     <li data-show="maize-maze" title="Show maize maze totals">Maize Maze Totals</li>
     <li data-show="skilling" title="Show skilling totals">Skilling Totals</li>
   `);
@@ -850,10 +850,10 @@ window.addEventListener('storage', function (e) {
     }
       break;
     // CUSTOM: Additional storage keys to check for changes in count
-    case `${APP_PREFIX}ClanGoodieBags`: {
-      let changedItems = parseInt(util.getLocalStorage(`${APP_PREFIX}ClanGoodieBags`));
-      if (clanGoodieBags != changedItems) {
-        clanGoodieBags = changedItems;
+    case `${APP_PREFIX}TrickOrTreatBags`: {
+      let changedItems = parseInt(util.getLocalStorage(`${APP_PREFIX}TrickOrTreatBags`));
+      if (trickOrTreatBags != changedItems) {
+        trickOrTreatBags = changedItems;
         dataChanged = true;
       }
       break;

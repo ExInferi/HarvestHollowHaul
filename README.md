@@ -41,6 +41,9 @@ Have fun tracking!
 * When opened on multiple clients, the toolbar display on all clients shows the most recently detected spoils from the last used client.
 
 ## Updates
+**Update 12 Oct 2026, 13:45 Game Time**:
+* Replaced clan goodie bags with trick or treat bags, as this years event has changed the rewards.
+
 **Update 31 Oct 2024, 23:30 Game Time**:
 * Fixed an issue where single spoils drops would not be logged.
 
